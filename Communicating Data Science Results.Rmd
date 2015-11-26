@@ -5,14 +5,10 @@ date: "November 26, 2015"
 output: html_document
 ---
 
-For this assignment, I looked at the crime incident data from San Francisco. I looked at the trend of different categories of crimes across the time of day. The Time of day was bucketed into 6 4-hour time periods.
+For this assignment, I looked at the crime incident data from San Francisco. Below is a histogram of the time occurance of the incident. we can see that the most incidents occur around 8PM and the fewest occur at 4AM.
 
 ```{r, echo=FALSE, fig.width=7, fig.height=7}
 sanfran <- read.csv("sanfrancisco_incidents_summer_2014.csv", as.is=TRUE)
-
-#head(sanfran)
-#sort(table(sanfran$Category))
-
 sanfran$Time_num <- sapply(strsplit(sanfran$Time,":"),
    function(x) {
    	x <- as.numeric(x)
@@ -20,9 +16,16 @@ sanfran$Time_num <- sapply(strsplit(sanfran$Time,":"),
    }
 )
 
-sanfran$Time_cat <- trunc(sanfran$Time_num / 4)
-#table(sanfran$Time_cat)
 
+hist(sanfran$Time_num, breaks=24, xlim=c(0, 25), 
+	 xlab="Hour of the Day", main="Incidents of Crime by time of day")
+
+```
+
+Next, I looked at the trend of different categories of crimes across the time of day. The Time of day was bucketed into 6 4-hour time periods.
+
+```{r, echo=FALSE, fig.width=7, fig.height=7}
+sanfran$Time_cat <- trunc(sanfran$Time_num / 4)
 t1 <- table(sanfran[sanfran$Category=='LARCENY/THEFT',]$Time_cat)/sum(sanfran$Category=='LARCENY/THEFT')
 t2 <- table(sanfran[sanfran$Category=='OTHER OFFENSES',]$Time_cat)/sum(sanfran$Category=='OTHER OFFENSES')
 t3 <- table(sanfran[sanfran$Category=='NON-CRIMINAL',]$Time_cat)/sum(sanfran$Category=='NON-CRIMINAL')
@@ -67,3 +70,18 @@ We see that Assults are most common in the early hours (12-4AM) and they were th
 Missing Persons are most common from 8am-12PM which would be when they are mostly commonly reported.
 
 Vehicle theft and Larceny theft occur late in the evening. Non-criminal crime happens mostly during the day.
+
+Below are the number of incidents for each time. Larceny/Theft have the most incidents throughout the day. We can see that Missing persons have a higher portion of the incidents from 8AM to Noon, but still has fewer incidents than Larceny/Theft
+
+
+```{r, echo=FALSE, fig.width=7, fig.height=7}
+sanfran_common <- sanfran[sanfran$Category %in% c("LARCENY/THEFT", "OTHER OFFENSES", "NON-CRIMINAL", "ASSAULT", "VEHICLE THEFT", "WARRANTS", "DRUG/NARCOTIC", "SUSPICIOUS OCC", "MISSING PERSON"),]
+
+t1 <- table(sanfran_common[sanfran_common$Time_cat==5,]$Category)
+pie(t1, labels=names(t1), main="Number of Indencents from 8PM-Midnight")
+
+t1 <- table(sanfran_common[sanfran_common$Time_cat==2,]$Category)
+pie(t1, labels=names(t1), main="Number of Indencents from 8AM-Noon")
+
+```
+
